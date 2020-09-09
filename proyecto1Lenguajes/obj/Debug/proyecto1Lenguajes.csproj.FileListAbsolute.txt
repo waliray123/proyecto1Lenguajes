@@ -1,0 +1,9 @@
+C:\Users\USUARIO\Desktop\proyecto1Lenguajes\proyecto1Lenguajes\bin\Debug\proyecto1Lenguajes.exe.config
+C:\Users\USUARIO\Desktop\proyecto1Lenguajes\proyecto1Lenguajes\bin\Debug\proyecto1Lenguajes.exe
+C:\Users\USUARIO\Desktop\proyecto1Lenguajes\proyecto1Lenguajes\bin\Debug\proyecto1Lenguajes.pdb
+C:\Users\USUARIO\Desktop\proyecto1Lenguajes\proyecto1Lenguajes\obj\Debug\proyecto1Lenguajes.csprojResolveAssemblyReference.cache
+C:\Users\USUARIO\Desktop\proyecto1Lenguajes\proyecto1Lenguajes\obj\Debug\proyecto1Lenguajes.Form1.resources
+C:\Users\USUARIO\Desktop\proyecto1Lenguajes\proyecto1Lenguajes\obj\Debug\proyecto1Lenguajes.Properties.Resources.resources
+C:\Users\USUARIO\Desktop\proyecto1Lenguajes\proyecto1Lenguajes\obj\Debug\proyecto1Lenguajes.csproj.GenerateResource.Cache
+C:\Users\USUARIO\Desktop\proyecto1Lenguajes\proyecto1Lenguajes\obj\Debug\proyecto1Lenguajes.exe
+C:\Users\USUARIO\Desktop\proyecto1Lenguajes\proyecto1Lenguajes\obj\Debug\proyecto1Lenguajes.pdb
