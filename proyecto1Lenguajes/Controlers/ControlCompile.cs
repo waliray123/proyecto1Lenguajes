@@ -11,33 +11,98 @@ namespace proyecto1Lenguajes.Controlers
     class ControlCompile
     {
         private RichTextBox richTextBox;
-        private ReservedWords reservedWordsCL = new ReservedWords();
+        private List<string> reserverdWords;
 
         public ControlCompile(RichTextBox richTextbox)
         {
             this.richTextBox = richTextbox;
+            initCompile();
+            reviewChars();
+        }
 
+        public void initCompile() {
+            //this.state = "0";
+            reserverdWords = new List<string>() { "SI", "SINO", "SINO_SI", "MIENTRAS", "HACER",
+                    "DESDE", "HASTA", "INCREMENTO"};
+        }                
+
+        public void reviewChars() {
+            //int quantityChars = 0;
+            String word = "";
+            int state = 0;
             for (int i = 0; i < this.richTextBox.Text.Length; i++)
             {
                 Char caracter = Convert.ToChar(this.richTextBox.Text.Substring(i, 1));
+                switch (state)
+                {
+                    case 0:
+                        if (Char.IsLetter(caracter))
+                        {
+                            goto case 1;
+                        }
+                        else if(Char.IsDigit(caracter))
+                        {
+                            goto case 2;
+                        }
+                        break;
+                    case 1:
+                        reviewIdentifier(ref i, caracter, this.richTextBox.Text);
+                        break;
+                    case 2:
+                        Console.WriteLine("Que tal estas, Pedro.");
+                        break;
 
-
-
-
-
+                }
+                word = "";
                 haySaltoLinea(caracter);
             }
-
         }
 
-        
-
-        public void haySaltoLinea(Char caracter) {
-            if (caracter.Equals('\n'))
+        private void reviewIdentifier(ref int i, Char character,String textRTB)
+        {
+            String word = "";
+            for (int x = i; x < textRTB.Length; x++)
+            {                
+                Char caracter = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));                
+                if ((caracter == ' ') || haySaltoLinea(caracter))
+                {
+                    break;
+                }
+                else
+                {
+                    i++;
+                    word += caracter;
+                }                
+            }
+            if (reserverdWords.Contains(word))
             {
-                MessageBox.Show("Hay salto de linea");
+                MessageBox.Show(word + " Es una palabra reservada");
+                paintReservedWords(word, i);
+            }
+            else {
+                MessageBox.Show(word + " Es un identificador");
             }            
         }
+
+        public void paintReservedWords(String word, int start)
+        {
+            this.richTextBox.Select(start- word.Length, word.Length);
+            this.richTextBox.SelectionColor = Color.Green;
+            this.richTextBox.SelectionStart = this.richTextBox.Text.Length;
+            this.richTextBox.SelectionColor = Color.Black;
+            this.richTextBox.SelectionStart = this.richTextBox.Text.Length;
+        }
+
+        public Boolean haySaltoLinea(Char caracter)
+        {
+            if (caracter.Equals('\n'))
+            {
+                return true;
+            }
+            return false;
+        }
+
+
 
 
         //private void getLines()
