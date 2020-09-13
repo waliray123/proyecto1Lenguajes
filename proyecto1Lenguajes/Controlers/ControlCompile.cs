@@ -11,21 +11,122 @@ namespace proyecto1Lenguajes.Controlers
     class ControlCompile
     {
         private RichTextBox richTextBox;
+        private ReservedWords reservedWordsCL = new ReservedWords();
 
         public ControlCompile(RichTextBox richTextbox)
         {
             this.richTextBox = richTextbox;
-            //getLines();
+
+            for (int i = 0; i < this.richTextBox.Text.Length; i++)
+            {
+                Char caracter = Convert.ToChar(this.richTextBox.Text.Substring(i, 1));
+
+
+
+
+
+                haySaltoLinea(caracter);
+            }
+
         }
 
-        private void getLines()
-        {
-            String[] words = richTextBox.Text.Split(' ');
-            for (int i = 0; i < words.Length; i++)
+        
+
+        public void haySaltoLinea(Char caracter) {
+            if (caracter.Equals('\n'))
             {
-                MessageBox.Show(words[i]);
+                MessageBox.Show("Hay salto de linea");
             }            
         }
+
+
+        //private void getLines()
+        //{
+        //    foreach (String line in richTextBox.Lines)
+        //    {                
+        //        String[] words = line.Split(' ');
+        //        for (int i = 0; i < words.Length; i++)
+        //        {
+        //            if (verifyReserved(words[i]) == false)
+        //            {
+        //                if (verifyAritmethicOperators(words[i]) == false)
+        //                {
+        //                    if (verifyReservedWords(words[i]) == false)
+        //                    {
+        //                        MessageBox.Show(words[i]+" No es palabra reservada");
+        //                    }
+        //                    else
+        //                    {
+        //                        MessageBox.Show(words[i] + " Es una palabra reservada");
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    MessageBox.Show(words[i]+ " Es un operador Aritmetico");
+        //                }
+        //            }
+        //            else
+        //            {
+        //                MessageBox.Show(words[i] + " Es reservada");
+        //            }
+        //        }
+        //    }                     
+        //}
+
+        //private Boolean verifyReserved(String word) {
+        //    Boolean isReserved = false;
+        //    foreach (String reserved in this.reservedWordsCL.getReserved())
+        //    {
+        //        if (word.Equals(reserved))
+        //        {
+        //            isReserved = true;
+        //            break;
+        //        }
+        //    }
+        //    return isReserved;
+        //}
+
+        //private Boolean verifyAritmethicOperators(String word)
+        //{
+        //    Boolean isReserved = false;
+        //    foreach (String reserved in this.reservedWordsCL.getArithmeticOperators())
+        //    {
+        //        if (word.Equals(reserved))
+        //        {
+        //            isReserved = true;
+        //            break;
+        //        }
+        //    }
+        //    return isReserved;
+        //}
+
+        //private Boolean verifyReservedWords(String word)
+        //{
+        //    Boolean isReserved = false;
+        //    foreach (String reserved in this.reservedWordsCL.getReservedWords())
+        //    {
+        //        if (word.Equals(reserved))
+        //        {
+        //            isReserved = true;
+        //            break;
+        //        }
+        //    }
+        //    return isReserved;
+        //}
+
+        //private Boolean verifyRelationalOperators(String word)
+        //{
+        //    Boolean isReserved = false;
+        //    foreach (String reserved in this.reservedWordsCL.getRelationalOperators())
+        //    {
+        //        if (word.Equals(reserved))
+        //        {
+        //            isReserved = true;
+        //            break;
+        //        }
+        //    }
+        //    return isReserved;
+        //}
 
         //public void addFilter(RichTextBox codeRichTextBox)
         //{

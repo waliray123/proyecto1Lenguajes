@@ -68,34 +68,7 @@ namespace proyecto1Lenguajes
             int line = this.richTextBox1.GetLineFromCharIndex(position) + 1;
             int column = position - this.richTextBox1.GetFirstCharIndexOfCurrentLine();
             this.label2.Text = line.ToString();
-            this.label4.Text = column.ToString();
-
-            try
-            {
-                this.richTextBox1.TextChanged += (ob, ev) =>
-                {
-                    var word = this.richTextBox1.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    String[] result = { "SI", "SINO", "MIENTRAS" };
-
-                    int start = 0;
-                    foreach (var item in result)
-                    {
-                        start = this.richTextBox1.Text.IndexOf(item, start);
-                        this.richTextBox1.Select(start, item.Length);
-                        this.richTextBox1.SelectionColor = Color.Green;
-                        this.richTextBox1.SelectionStart = this.richTextBox1.Text.Length;
-                        start++;
-                    }
-
-                    this.richTextBox1.SelectionColor = Color.White;
-                    this.richTextBox1.SelectionStart = this.richTextBox1.Text.Length;
-
-                };
-            }
-            catch (Exception es)
-            {
-                MessageBox.Show("error " + es.Message);
-            }
+            this.label4.Text = column.ToString();            
         }
 
     }
