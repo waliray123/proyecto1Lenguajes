@@ -12,6 +12,8 @@ namespace proyecto1Lenguajes.Controlers
     {
         private RichTextBox richTextBox;
         private List<string> reserverdWords;
+        private List<string> arithmeticOperators;
+
 
         public ControlCompile(RichTextBox richTextbox)
         {
@@ -20,15 +22,17 @@ namespace proyecto1Lenguajes.Controlers
             reviewChars();
         }
 
-        public void initCompile() {
+        private void initCompile()
+        {
             //this.state = "0";
             reserverdWords = new List<string>() { "SI", "SINO", "SINO_SI", "MIENTRAS", "HACER",
                     "DESDE", "HASTA", "INCREMENTO"};
+            arithmeticOperators = new List<string>() { "+", "-", "*", "/", "++", "--"};
+
         }                
 
-        public void reviewChars() {
-            //int quantityChars = 0;
-            String word = "";
+        public void reviewChars()
+        {
             int state = 0;
             for (int i = 0; i < this.richTextBox.Text.Length; i++)
             {
@@ -40,21 +44,26 @@ namespace proyecto1Lenguajes.Controlers
                         {
                             goto case 1;
                         }
-                        else if(Char.IsDigit(caracter))
+                        else if (Char.IsDigit(caracter))
                         {
                             goto case 2;
                         }
-                        break;
+                        else
+                        {
+                            goto case 3;
+                        }
                     case 1:
                         reviewIdentifier(ref i, caracter, this.richTextBox.Text);
                         break;
                     case 2:
                         Console.WriteLine("Que tal estas, Pedro.");
                         break;
+                    case 3:
+                        reviewSymbols(ref i, caracter);
+                        break;
 
                 }
-                word = "";
-                haySaltoLinea(caracter);
+                isLineBreak(caracter);
             }
         }
 
@@ -64,7 +73,7 @@ namespace proyecto1Lenguajes.Controlers
             for (int x = i; x < textRTB.Length; x++)
             {                
                 Char caracter = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));                
-                if ((caracter == ' ') || haySaltoLinea(caracter))
+                if ((caracter == ' ') || isLineBreak(caracter))
                 {
                     break;
                 }
@@ -77,33 +86,151 @@ namespace proyecto1Lenguajes.Controlers
             if (reserverdWords.Contains(word))
             {
                 MessageBox.Show(word + " Es una palabra reservada");
-                paintReservedWords(word, i);
+                paintReservedWords(word, i, Color.Green);
             }
             else {
+                paintReservedWords(word, i, Color.Black);
                 MessageBox.Show(word + " Es un identificador");
-            }            
+            }
         }
 
-        public void paintReservedWords(String word, int start)
+        private void reviewSymbols(ref int i ,Char character)
+        {
+            int countSymbols = 0;
+            String word = "";            
+            if (character == '/')
+            {
+                word += character;
+                if ((i + 2) <= this.richTextBox.Text.Length)
+                {                    
+                    character = Convert.ToChar(this.richTextBox.Text.Substring((i+1), 1));
+                    if (character == '/')
+                    {
+                        reviewComment1(ref i);
+                    }
+                    else if (character == '*')
+                    {
+                        reviewComment2(ref i);
+                    }
+                    else if (character == ' ' || isLineBreak(character))
+                    {
+                        paintReservedWords(word, i+1, Color.Blue);
+                    }
+                    else
+                    {
+                        // error quizas quisiste poner un comentario
+                        MessageBox.Show("Falta / para comentario");
+                    }
+                }
+                else
+                {                    
+                    paintReservedWords(word, i+1, Color.Blue);
+                }                                
+            }
+            else if (this.arithmeticOperators.Contains(character.ToString()))
+            {                
+                for (int x = i; x < this.richTextBox.Text.Length; x++)
+                {
+                    character = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));
+                    if (character == ' ' || isLineBreak(character))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        i++;
+                        word += character;
+                        countSymbols++;
+                    }
+                }
+                if (countSymbols <= 2)
+                {
+                    if (this.arithmeticOperators.Contains(word))
+                    {
+                        paintReservedWords(word, i, Color.Blue);
+                    }
+                }
+            }
+
+
+        }
+
+        private void reviewComment1(ref int i)
+        {
+            String word = "";
+            for (int x = i; x < this.richTextBox.Text.Length; x++)
+            {
+                Char character = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));
+                if (isLineBreak(character))
+                {
+                    break;
+                }
+                else
+                {
+                    i++;
+                    word += character;
+                }
+            }
+            paintReservedWords(word, i, Color.Red);
+        }
+        private void reviewComment2(ref int i)
+        {
+            Boolean commentClosed = false;
+            String word = "";
+            for (int x = i; x < this.richTextBox.Text.Length; x++)
+            {
+                Char character = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));
+                if (character == '*')
+                {                    
+                    if ((x+1) <= this.richTextBox.Text.Length)
+                    {
+                        Char character2 = Convert.ToChar(this.richTextBox.Text.Substring((x + 1), 1));
+                        if (character2 == '/')
+                        {
+                            i = i +2;
+                            word += character;
+                            word += character2;
+                            commentClosed = true;
+                            break;
+                        }
+                        else
+                        {
+                            i++;
+                            word += character;
+                        }
+                    }                 
+                }
+                else
+                {
+                    i++;
+                    word += character;
+                }
+            }
+            paintReservedWords(word, i, Color.Red);
+            if(commentClosed == false)
+            { 
+                // error falta cierre de comentario
+                MessageBox.Show("Error falta cierre de comentario");
+            }
+        }
+
+        public void paintReservedWords(String word, int start, Color color)
         {
             this.richTextBox.Select(start- word.Length, word.Length);
-            this.richTextBox.SelectionColor = Color.Green;
+            this.richTextBox.SelectionColor = color;
             this.richTextBox.SelectionStart = this.richTextBox.Text.Length;
             this.richTextBox.SelectionColor = Color.Black;
             this.richTextBox.SelectionStart = this.richTextBox.Text.Length;
         }
 
-        public Boolean haySaltoLinea(Char caracter)
+        public Boolean isLineBreak(Char caracter)
         {
             if (caracter.Equals('\n'))
             {
                 return true;
             }
             return false;
-        }
-
-
-
+        }       
 
         //private void getLines()
         //{
