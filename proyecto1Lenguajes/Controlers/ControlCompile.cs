@@ -14,6 +14,8 @@ namespace proyecto1Lenguajes.Controlers
         private List<string> reserverdWords;
         private List<string> reserverdBoolean;
         private List<string> arithmeticOperators;
+        private List<string> relationalOperators;
+        private List<string> logicOperators;
 
 
         public ControlCompile(RichTextBox richTextbox)
@@ -29,7 +31,9 @@ namespace proyecto1Lenguajes.Controlers
             reserverdWords = new List<string>() { "SI", "SINO", "SINO_SI", "MIENTRAS", "HACER",
                     "DESDE", "HASTA", "INCREMENTO"};
             arithmeticOperators = new List<string>() { "+", "-", "*", "/", "++", "--"};
+            relationalOperators = new List<string>() { ">=", "<=", "==", ">", "<", "!=" };
             reserverdBoolean = new List<string>() {"verdadero","falso"};
+            logicOperators = new List<string>() { "||", "&&", "!" };
         }                
 
         public void reviewChars()
@@ -57,7 +61,7 @@ namespace proyecto1Lenguajes.Controlers
                         reviewIdentifier(ref i, caracter, this.richTextBox.Text);
                         break;
                     case 2:
-                        Console.WriteLine("Que tal estas, Pedro.");
+                        reviewDigits(ref i);
                         break;
                     case 3:
                         reviewSymbols(ref i, caracter);
@@ -137,6 +141,10 @@ namespace proyecto1Lenguajes.Controlers
                     paintReservedWords(word, i + 1, Color.Blue);
                 }
             }
+            else if (character == '"')
+            {
+                reviewTextString(ref i);
+            }
             else if (character == ';')
             {
                 word += character;
@@ -147,7 +155,56 @@ namespace proyecto1Lenguajes.Controlers
                 word += character;
                 paintReservedWords(word, i + 1, Color.Blue);
             }
-            else if (this.arithmeticOperators.Contains(character.ToString()))
+            else if (character == '=')
+            {
+                word += character;
+                if (((i + 2) <= this.richTextBox.Text.Length) || (character == ' ') || (isLineBreak(character)))
+                {
+                    character = Convert.ToChar(this.richTextBox.Text.Substring((i + 1), 1));
+                    word += character;
+                    if (character == '=')
+                    {
+                        i++;
+                        paintReservedWords(word, i + 1, Color.Blue);
+                    }
+                    else
+                    {
+                        paintReservedWords(word, i + 1, Color.Pink);
+                    }
+                }
+                else
+                {
+                    paintReservedWords(word, i + 1, Color.Pink);
+                }
+            }
+            else if (character == '-')
+            {
+                word += character;
+                if (((i + 2) <= this.richTextBox.Text.Length) || (character == ' ') || (isLineBreak(character)))
+                {
+                    character = Convert.ToChar(this.richTextBox.Text.Substring((i + 1), 1));
+                    word += character;
+                    if (Char.IsDigit(character))
+                    {
+                        reviewDigits(ref i);
+                        MessageBox.Show("Es un numero negativo");
+                    }
+                    else if (character == '-')
+                    {
+                        i++;
+                        paintReservedWords(word, i + 1, Color.Blue);
+                    }
+                    else
+                    {
+                        paintReservedWords(word, i + 1, Color.Blue);
+                    }
+                }
+                else
+                {
+                    paintReservedWords(word, i + 1, Color.Blue);
+                }
+            }
+            else if (this.relationalOperators.Contains(character.ToString()))
             {
                 for (int x = i; x < this.richTextBox.Text.Length; x++)
                 {
@@ -165,6 +222,37 @@ namespace proyecto1Lenguajes.Controlers
                 }
                 if (countSymbols <= 2)
                 {
+                    if (this.relationalOperators.Contains(word))
+                    {
+                        paintReservedWords(word, i, Color.Blue);
+                    }
+                }
+                else
+                {
+                    //Error El operador realacional no existe
+                    MessageBox.Show("El operador realacional no es correcto");
+                }
+                i--;
+            }
+            else if (this.arithmeticOperators.Contains(character.ToString()))
+            {
+                for (int x = i; x < this.richTextBox.Text.Length; x++)
+                {
+                    character = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));
+                    if (character == ' ' || isLineBreak(character) || character == ';')
+                    {
+                        break;
+                    }
+                    else
+                    {
+
+                        i++;
+                        word += character;
+                        countSymbols++;
+                    }
+                }
+                if (countSymbols <= 2)
+                {
                     if (this.arithmeticOperators.Contains(word))
                     {
                         paintReservedWords(word, i, Color.Blue);
@@ -173,11 +261,41 @@ namespace proyecto1Lenguajes.Controlers
                 else
                 {
                     //Error El operador aritmetico no existe
+                    MessageBox.Show("El operador aritmetico no es correcto");
                 }
                 i--;
+            }            
+        }
+        private void reviewTextString(ref int i)
+        {
+            String word = "";
+            Boolean isClosed = false;
+            int initString = i;
+            for (int x = i; x < this.richTextBox.Text.Length; x++)
+            {
+                Char character = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));
+                if (isLineBreak(character) || (character == '"' && initString != x))
+                {
+                    if (character == '"')
+                    {
+                        i++;
+                        word += character;
+                        isClosed = true;
+                    }
+                    break;
+                }
+                else
+                {
+                    i++;
+                    word += character;
+                }
             }
-            
-
+            if (isClosed == false)
+            {
+                MessageBox.Show("Error la cadena de texto no esta cerrada");
+            }
+            paintReservedWords(word, i, Color.Gray);
+            i--;
         }
 
         private void reviewComment1(ref int i)
@@ -239,6 +357,39 @@ namespace proyecto1Lenguajes.Controlers
             }
         }
 
+        private void reviewDigits(ref int i)
+        {
+            String word = "";
+            int quantityPoints = 0;
+            int initCount = i;
+            for (int x = i; x < this.richTextBox.Text.Length; x++)
+            {
+                Char character = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));
+                Boolean charIsDigit = Char.IsDigit(character);
+                if (charIsDigit || (character == '.' && quantityPoints <= 1) || (x== initCount && character == '-'))
+                {
+                    if (character == '.')
+                    {
+                        quantityPoints++;
+                    }
+                    i++;
+                    word += character;
+                }
+                else
+                {
+                    break;                    
+                }
+            }
+            if (quantityPoints == 0)
+            {
+                paintReservedWords(word, i, Color.Purple);
+            }
+            else if (quantityPoints == 1)
+            {
+                paintReservedWords(word, i, Color.LightBlue);
+            }
+            i--;
+        }
         public void paintReservedWords(String word, int start, Color color)
         {
             this.richTextBox.Select(start- word.Length, word.Length);
@@ -256,126 +407,5 @@ namespace proyecto1Lenguajes.Controlers
             }
             return false;
         }       
-
-        //private void getLines()
-        //{
-        //    foreach (String line in richTextBox.Lines)
-        //    {                
-        //        String[] words = line.Split(' ');
-        //        for (int i = 0; i < words.Length; i++)
-        //        {
-        //            if (verifyReserved(words[i]) == false)
-        //            {
-        //                if (verifyAritmethicOperators(words[i]) == false)
-        //                {
-        //                    if (verifyReservedWords(words[i]) == false)
-        //                    {
-        //                        MessageBox.Show(words[i]+" No es palabra reservada");
-        //                    }
-        //                    else
-        //                    {
-        //                        MessageBox.Show(words[i] + " Es una palabra reservada");
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    MessageBox.Show(words[i]+ " Es un operador Aritmetico");
-        //                }
-        //            }
-        //            else
-        //            {
-        //                MessageBox.Show(words[i] + " Es reservada");
-        //            }
-        //        }
-        //    }                     
-        //}
-
-        //private Boolean verifyReserved(String word) {
-        //    Boolean isReserved = false;
-        //    foreach (String reserved in this.reservedWordsCL.getReserved())
-        //    {
-        //        if (word.Equals(reserved))
-        //        {
-        //            isReserved = true;
-        //            break;
-        //        }
-        //    }
-        //    return isReserved;
-        //}
-
-        //private Boolean verifyAritmethicOperators(String word)
-        //{
-        //    Boolean isReserved = false;
-        //    foreach (String reserved in this.reservedWordsCL.getArithmeticOperators())
-        //    {
-        //        if (word.Equals(reserved))
-        //        {
-        //            isReserved = true;
-        //            break;
-        //        }
-        //    }
-        //    return isReserved;
-        //}
-
-        //private Boolean verifyReservedWords(String word)
-        //{
-        //    Boolean isReserved = false;
-        //    foreach (String reserved in this.reservedWordsCL.getReservedWords())
-        //    {
-        //        if (word.Equals(reserved))
-        //        {
-        //            isReserved = true;
-        //            break;
-        //        }
-        //    }
-        //    return isReserved;
-        //}
-
-        //private Boolean verifyRelationalOperators(String word)
-        //{
-        //    Boolean isReserved = false;
-        //    foreach (String reserved in this.reservedWordsCL.getRelationalOperators())
-        //    {
-        //        if (word.Equals(reserved))
-        //        {
-        //            isReserved = true;
-        //            break;
-        //        }
-        //    }
-        //    return isReserved;
-        //}
-
-        //public void addFilter(RichTextBox codeRichTextBox)
-        //{
-        //    try
-        //    {
-        //        codeRichTextBox.TextChanged += (ob, ev) =>
-        //        {
-        //            var word = codeRichTextBox.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-        //            var result = from b in reserved
-        //                         from c in word
-        //                         where c == b
-        //                         select b;
-
-        //            int start = 0;
-        //            foreach (var item in result)
-        //            {
-        //                start = codeRichTextBox.Text.IndexOf(item, start);
-        //                codeRichTextBox.Select(start, item.Length);
-        //                codeRichTextBox.SelectionColor = Color.Green;
-        //                codeRichTextBox.SelectionStart = codeRichTextBox.Text.Length;
-        //                start++;
-        //            }
-
-        //            codeRichTextBox.SelectionColor = Color.White;
-        //            codeRichTextBox.SelectionStart = codeRichTextBox.Text.Length;
-
-        //        };
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        MessageBox.Show("error " + e.Message);
-        //    }
-        //}
     }
 }
