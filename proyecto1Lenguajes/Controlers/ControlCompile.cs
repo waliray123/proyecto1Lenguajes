@@ -12,6 +12,7 @@ namespace proyecto1Lenguajes.Controlers
     {
         private RichTextBox richTextBox;
         private List<string> reserverdWords;
+        private List<string> reserverdBoolean;
         private List<string> arithmeticOperators;
 
 
@@ -28,7 +29,7 @@ namespace proyecto1Lenguajes.Controlers
             reserverdWords = new List<string>() { "SI", "SINO", "SINO_SI", "MIENTRAS", "HACER",
                     "DESDE", "HASTA", "INCREMENTO"};
             arithmeticOperators = new List<string>() { "+", "-", "*", "/", "++", "--"};
-
+            reserverdBoolean = new List<string>() {"verdadero","falso"};
         }                
 
         public void reviewChars()
@@ -71,9 +72,9 @@ namespace proyecto1Lenguajes.Controlers
         {
             String word = "";
             for (int x = i; x < textRTB.Length; x++)
-            {                
-                Char caracter = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));                
-                if ((caracter == ' ') || isLineBreak(caracter))
+            {
+                Char caracter = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));
+                if ((caracter == ' ') || isLineBreak(caracter) || (Char.IsLetter(caracter)==false && Char.IsDigit(caracter)== false))
                 {
                     break;
                 }
@@ -81,29 +82,38 @@ namespace proyecto1Lenguajes.Controlers
                 {
                     i++;
                     word += caracter;
-                }                
+                }
             }
             if (reserverdWords.Contains(word))
             {
                 MessageBox.Show(word + " Es una palabra reservada");
                 paintReservedWords(word, i, Color.Green);
             }
+            else if(reserverdBoolean.Contains(word))
+            {
+                paintReservedWords(word, i, Color.Orange);
+            }
+            else if (word.Length == 1)
+            {
+                paintReservedWords(word, i, Color.Brown);
+            }
             else {
                 paintReservedWords(word, i, Color.Black);
                 MessageBox.Show(word + " Es un identificador");
             }
+            i--;
         }
 
         private void reviewSymbols(ref int i ,Char character)
         {
             int countSymbols = 0;
-            String word = "";            
+            String word = "";
             if (character == '/')
             {
                 word += character;
                 if ((i + 2) <= this.richTextBox.Text.Length)
-                {                    
-                    character = Convert.ToChar(this.richTextBox.Text.Substring((i+1), 1));
+                {
+                    character = Convert.ToChar(this.richTextBox.Text.Substring((i + 1), 1));
                     if (character == '/')
                     {
                         reviewComment1(ref i);
@@ -114,7 +124,7 @@ namespace proyecto1Lenguajes.Controlers
                     }
                     else if (character == ' ' || isLineBreak(character))
                     {
-                        paintReservedWords(word, i+1, Color.Blue);
+                        paintReservedWords(word, i + 1, Color.Blue);
                     }
                     else
                     {
@@ -123,16 +133,26 @@ namespace proyecto1Lenguajes.Controlers
                     }
                 }
                 else
-                {                    
-                    paintReservedWords(word, i+1, Color.Blue);
-                }                                
+                {
+                    paintReservedWords(word, i + 1, Color.Blue);
+                }
+            }
+            else if (character == ';')
+            {
+                word += character;
+                paintReservedWords(word, i + 1, Color.DeepPink);
+            }
+            else if (character == '(' || character == ')')
+            {
+                word += character;
+                paintReservedWords(word, i + 1, Color.Blue);
             }
             else if (this.arithmeticOperators.Contains(character.ToString()))
-            {                
+            {
                 for (int x = i; x < this.richTextBox.Text.Length; x++)
                 {
                     character = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));
-                    if (character == ' ' || isLineBreak(character))
+                    if (character == ' ' || isLineBreak(character) || character == ';')
                     {
                         break;
                     }
@@ -150,8 +170,13 @@ namespace proyecto1Lenguajes.Controlers
                         paintReservedWords(word, i, Color.Blue);
                     }
                 }
+                else
+                {
+                    //Error El operador aritmetico no existe
+                }
+                i--;
             }
-
+            
 
         }
 
