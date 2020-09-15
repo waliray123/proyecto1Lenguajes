@@ -15,10 +15,12 @@ namespace proyecto1Lenguajes
     public partial class Form1 : Form
     {
         private String pathFile;
+        private int numberErrors;
         public Form1()
         {
             InitializeComponent();
             pathFile = "";
+            numberErrors = 0;
         }
 
         private void archivoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -34,7 +36,7 @@ namespace proyecto1Lenguajes
 
         private void button1_Click(object sender, EventArgs e)
         {
-            ControlCompile control = new ControlCompile(this.richTextBox1);
+            ControlCompile control = new ControlCompile(this.richTextBox1, this.dataGridView1, ref this.numberErrors);
 
             int position = this.richTextBox1.SelectionStart;
             int line = this.richTextBox1.GetLineFromCharIndex(position)+1;
@@ -69,7 +71,11 @@ namespace proyecto1Lenguajes
             int column = position - this.richTextBox1.GetFirstCharIndexOfCurrentLine();
             this.label2.Text = line.ToString();
             this.label4.Text = column.ToString();            
-        }
+        }        
 
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 }

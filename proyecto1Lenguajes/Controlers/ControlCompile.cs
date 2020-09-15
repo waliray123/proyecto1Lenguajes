@@ -11,6 +11,8 @@ namespace proyecto1Lenguajes.Controlers
     class ControlCompile
     {
         private RichTextBox richTextBox;
+        private DataGridView dataGridView;
+        private int numberErrors;
         private List<string> reserverdWords;
         private List<string> reserverdBoolean;
         private List<string> arithmeticOperators;
@@ -18,9 +20,11 @@ namespace proyecto1Lenguajes.Controlers
         private List<string> logicOperators;
 
 
-        public ControlCompile(RichTextBox richTextbox)
+        public ControlCompile(RichTextBox richTextbox, DataGridView datagridview, ref int numberErrors)
         {
             this.richTextBox = richTextbox;
+            this.dataGridView = datagridview;
+            this.numberErrors = numberErrors;
             initCompile();
             reviewChars();
         }
@@ -34,8 +38,9 @@ namespace proyecto1Lenguajes.Controlers
             relationalOperators = new List<string>() { ">=", "<=", "==", ">", "<", "!=" };
             reserverdBoolean = new List<string>() {"verdadero","falso"};
             logicOperators = new List<string>() { "||", "&&", "!" };
-        }                
-
+            this.dataGridView.Rows.Clear();
+            this.numberErrors = 0;
+        }
         public void reviewChars()
         {
             int state = 0;
@@ -53,6 +58,10 @@ namespace proyecto1Lenguajes.Controlers
                         {
                             goto case 2;
                         }
+                        else if (caracter == '|')
+                        {
+                            goto case 4;
+                        }
                         else
                         {
                             goto case 3;
@@ -65,6 +74,9 @@ namespace proyecto1Lenguajes.Controlers
                         break;
                     case 3:
                         reviewSymbols(ref i, caracter);
+                        break;
+                    case 4:
+                        reviewOr(ref i);
                         break;
 
                 }
@@ -90,7 +102,7 @@ namespace proyecto1Lenguajes.Controlers
             }
             if (reserverdWords.Contains(word))
             {
-                MessageBox.Show(word + " Es una palabra reservada");
+                //MessageBox.Show(word + " Es una palabra reservada");
                 paintReservedWords(word, i, Color.Green);
             }
             else if(reserverdBoolean.Contains(word))
@@ -103,7 +115,7 @@ namespace proyecto1Lenguajes.Controlers
             }
             else {
                 paintReservedWords(word, i, Color.Black);
-                MessageBox.Show(word + " Es un identificador");
+                //MessageBox.Show(word + " Es un identificador");
             }
             i--;
         }
@@ -133,7 +145,8 @@ namespace proyecto1Lenguajes.Controlers
                     else
                     {
                         // error quizas quisiste poner un comentario
-                        MessageBox.Show("Falta / para comentario");
+                        //MessageBox.Show("Falta / para comentario");
+                        addError("Falta / para hacer un comentario");
                     }
                 }
                 else
@@ -187,7 +200,7 @@ namespace proyecto1Lenguajes.Controlers
                     if (Char.IsDigit(character))
                     {
                         reviewDigits(ref i);
-                        MessageBox.Show("Es un numero negativo");
+                       // MessageBox.Show("Es un numero negativo");
                     }
                     else if (character == '-')
                     {
@@ -230,9 +243,36 @@ namespace proyecto1Lenguajes.Controlers
                 else
                 {
                     //Error El operador realacional no existe
-                    MessageBox.Show("El operador realacional no es correcto");
+                    //MessageBox.Show("El operador realacional no es correcto");
+                    addError("Error el operador relacional no existe");
                 }
                 i--;
+            }
+            else if (character == '&')
+            {
+                if ((i + 2) <= this.richTextBox.Text.Length)
+                {
+                    character = Convert.ToChar(this.richTextBox.Text.Substring(i + 1, 1));
+                    if (character == '&')
+                    {
+                        i++;
+                        paintReservedWords("&&", i + 1, Color.Blue);
+                    }
+                    else
+                    {
+                        //Error el operador logico esta mal escrito
+                        addError("Error el operador logico esta mal escrito");
+                    }
+                }
+                else
+                {
+                    //Error el operador logico esta mal escrito
+                    addError("Error el operador logico esta mal escrito");
+                }
+            }
+            else if (character == '!')
+            {
+                paintReservedWords("!", i+1, Color.Blue);
             }
             else if (this.arithmeticOperators.Contains(character.ToString()))
             {
@@ -261,7 +301,8 @@ namespace proyecto1Lenguajes.Controlers
                 else
                 {
                     //Error El operador aritmetico no existe
-                    MessageBox.Show("El operador aritmetico no es correcto");
+                    //MessageBox.Show("El operador aritmetico no es correcto");
+                    addError("Error el operador aritmetico no es correcto");
                 }
                 i--;
             }            
@@ -292,7 +333,8 @@ namespace proyecto1Lenguajes.Controlers
             }
             if (isClosed == false)
             {
-                MessageBox.Show("Error la cadena de texto no esta cerrada");
+                // MessageBox.Show("Error la cadena de texto no esta cerrada");
+                addError("La cadena de texto no esta cerrada");
             }
             paintReservedWords(word, i, Color.Gray);
             i--;
@@ -351,9 +393,10 @@ namespace proyecto1Lenguajes.Controlers
             }
             paintReservedWords(word, i, Color.Red);
             if(commentClosed == false)
-            { 
+            {
                 // error falta cierre de comentario
-                MessageBox.Show("Error falta cierre de comentario");
+                //MessageBox.Show("Error falta cierre de comentario");
+                addError("Error falta cierre de comentario");
             }
         }
 
@@ -390,6 +433,25 @@ namespace proyecto1Lenguajes.Controlers
             }
             i--;
         }
+
+        public void reviewOr(ref int i)
+        {
+            if ((i+2) <= this.richTextBox.Text.Length)
+            {
+                Char character = Convert.ToChar(this.richTextBox.Text.Substring(i+1, 1));
+                if (character == '|' )
+                {
+                    i++;
+                    paintReservedWords("||", i+1, Color.Blue);
+                }
+                else
+                {
+                    //Error el operador logico esta mal escrito
+                    addError("Error el operador logico esta mal escrito");
+                }
+            }
+        }
+
         public void paintReservedWords(String word, int start, Color color)
         {
             this.richTextBox.Select(start- word.Length, word.Length);
@@ -406,6 +468,18 @@ namespace proyecto1Lenguajes.Controlers
                 return true;
             }
             return false;
-        }       
+        }
+
+        public void addError(String typeError)
+        {
+            numberErrors++;
+            DataGridViewRow row = new DataGridViewRow();
+            row.CreateCells(this.dataGridView);
+            row.Cells[0].Value = this.numberErrors;
+            row.Cells[1].Value = typeError;
+            row.Cells[2].Value = "Fila de error";
+
+            this.dataGridView.Rows.Add(row);
+        }
     }
 }
