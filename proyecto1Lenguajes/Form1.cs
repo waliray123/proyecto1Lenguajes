@@ -16,11 +16,13 @@ namespace proyecto1Lenguajes
     {
         private String pathFile;
         private int numberErrors;
+        private ControlCompile control;
         public Form1()
         {
             InitializeComponent();
             pathFile = "";
             numberErrors = 0;
+            this.control = new ControlCompile(this.richTextBox1, this.dataGridView1, ref this.numberErrors);
         }
 
         private void archivoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -36,14 +38,22 @@ namespace proyecto1Lenguajes
 
         private void button1_Click(object sender, EventArgs e)
         {
-            ControlCompile control = new ControlCompile(this.richTextBox1, this.dataGridView1, ref this.numberErrors);
+            this.control = new ControlCompile(this.richTextBox1, this.dataGridView1, ref this.numberErrors);
 
             int position = this.richTextBox1.SelectionStart;
             int line = this.richTextBox1.GetLineFromCharIndex(position)+1;
             int column = position - this.richTextBox1.GetFirstCharIndexOfCurrentLine();
             this.label2.Text = line.ToString();
             this.label4.Text = column.ToString();
-            MessageBox.Show("Se compilo con exito");
+            if (this.numberErrors <= 0)
+            {
+                MessageBox.Show("Se compilo con exito");
+            }
+            else
+            {
+                MessageBox.Show("No se compilo con exito, Existen errores por arreglar");
+            }
+            
         }
 
         private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
@@ -70,12 +80,14 @@ namespace proyecto1Lenguajes
             int line = this.richTextBox1.GetLineFromCharIndex(position) + 1;
             int column = position - this.richTextBox1.GetFirstCharIndexOfCurrentLine();
             this.label2.Text = line.ToString();
-            this.label4.Text = column.ToString();            
+            this.label4.Text = column.ToString();
+
+            //this.control.reviewChars();
         }        
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-
+            
         }
     }
 }

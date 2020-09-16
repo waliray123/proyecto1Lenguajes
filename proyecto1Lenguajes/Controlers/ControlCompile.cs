@@ -32,8 +32,7 @@ namespace proyecto1Lenguajes.Controlers
         private void initCompile()
         {
             //this.state = "0";
-            reserverdWords = new List<string>() { "SI", "SINO", "SINO_SI", "MIENTRAS", "HACER",
-                    "DESDE", "HASTA", "INCREMENTO"};
+            reserverdWords = new List<string>() { "SI", "SINO", "SINO_SI", "MIENTRAS", "HACER","DESDE", "HASTA", "INCREMENTO"};
             arithmeticOperators = new List<string>() { "+", "-", "*", "/", "++", "--"};
             relationalOperators = new List<string>() { ">=", "<=", "==", ">", "<", "!=" };
             reserverdBoolean = new List<string>() {"verdadero","falso"};
@@ -43,6 +42,8 @@ namespace proyecto1Lenguajes.Controlers
         }
         public void reviewChars()
         {
+            this.dataGridView.Rows.Clear();
+            this.numberErrors = 0;
             int state = 0;
             for (int i = 0; i < this.richTextBox.Text.Length; i++)
             {
@@ -78,7 +79,6 @@ namespace proyecto1Lenguajes.Controlers
                     case 4:
                         reviewOr(ref i);
                         break;
-
                 }
                 isLineBreak(caracter);
             }
@@ -367,7 +367,7 @@ namespace proyecto1Lenguajes.Controlers
                 Char character = Convert.ToChar(this.richTextBox.Text.Substring(x, 1));
                 if (character == '*')
                 {                    
-                    if ((x+1) <= this.richTextBox.Text.Length)
+                    if ((x+2) <= this.richTextBox.Text.Length)
                     {
                         Char character2 = Convert.ToChar(this.richTextBox.Text.Substring((x + 1), 1));
                         if (character2 == '/')
@@ -429,7 +429,23 @@ namespace proyecto1Lenguajes.Controlers
             }
             else if (quantityPoints == 1)
             {
-                paintReservedWords(word, i, Color.LightBlue);
+                try
+                {
+                    double number = Double.Parse(word);
+                    String[] numberSeparated = word.Split('.');
+                    if (numberSeparated[1].Equals(""))
+                    {
+                        addError("El numero decimal esta mal escrito");
+                    }
+                    else
+                    {
+                        paintReservedWords(word, i, Color.LightBlue);
+                    }                    
+                }
+                catch (Exception e)
+                {
+                    addError("El numero decimal esta mal escrito");
+                }                
             }
             i--;
         }
@@ -472,13 +488,11 @@ namespace proyecto1Lenguajes.Controlers
 
         public void addError(String typeError)
         {
-            numberErrors++;
+            this.numberErrors++;
             DataGridViewRow row = new DataGridViewRow();
             row.CreateCells(this.dataGridView);
             row.Cells[0].Value = this.numberErrors;
             row.Cells[1].Value = typeError;
-            row.Cells[2].Value = "Fila de error";
-
             this.dataGridView.Rows.Add(row);
         }
     }
