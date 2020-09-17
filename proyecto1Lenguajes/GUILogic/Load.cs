@@ -21,7 +21,7 @@ namespace proyecto1Lenguajes.GUILogic
         {
             String pathFile = "";
             OpenFileDialog open = new OpenFileDialog();
-            open.Filter = "Documento tipo gtE |*.gt";
+            open.Filter = "Documento tipo gt |*.gt";
             open.Title = "Cargar Archivo";
             var res = open.ShowDialog();
             if (res == DialogResult.OK)

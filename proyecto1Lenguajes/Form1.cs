@@ -47,7 +47,7 @@ namespace proyecto1Lenguajes
             this.label4.Text = column.ToString();
             if (this.numberErrors <= 0)
             {
-                MessageBox.Show("Se compilo con exito");
+                MessageBox.Show("Se analizo con exito");
             }
             else
             {
@@ -64,8 +64,15 @@ namespace proyecto1Lenguajes
 
         private void guardarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Save save = new GUILogic.Save(this.richTextBox1);
-            save.saveData(this.pathFile);
+            if (pathFile.Equals(""))
+            {
+                MessageBox.Show("No se ha cargado ningun archivo",null,MessageBoxButtons.OK,MessageBoxIcon.Error);
+            }else
+            {
+                Save save = new GUILogic.Save(this.richTextBox1);
+                save.saveData(this.pathFile);
+                MessageBox.Show("Se guardo con exito");
+            }            
         }
 
         private void guardarComoToolStripMenuItem_Click(object sender, EventArgs e)

@@ -24,7 +24,7 @@ namespace proyecto1Lenguajes.GUILogic
         public void saveAsData()
         {
             SaveFileDialog saveAs = new SaveFileDialog();
-            saveAs.Filter = "Documento tipo texto |*.gt";
+            saveAs.Filter = "Documento tipo gt |*.gt";
             saveAs.Title = "Guardar Archivo";
             var res = saveAs.ShowDialog();
             if (res == DialogResult.OK)
